@@ -293,9 +293,49 @@ class PluginIdeasIdeiaCreator {
 
     private static function sanitizeRichText(?string $value): string {
         $value = $value ?? '';
-        // Retorna o conteúdo HTML do TinyMCE sem processar
-        // O GLPI já faz a sanitização internamente ao salvar
-        return $value;
+
+        if ($value === '') {
+            return '';
+        }
+
+        $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // Normaliza sequências de quebras de linha vindas como texto literal ("\n")
+        $decoded = str_replace(['\r\n', '\r', '\n'], "\n", $decoded);
+        $decoded = str_replace(["\r\n", "\r"], "\n", $decoded);
+
+        $allowedTags = '<p><br><strong><em><u><ol><ul><li><a><h1><h2><h3><h4><h5><h6><table><thead><tbody><tfoot><tr><th><td><div><span>';
+
+        $sanitized = strip_tags($decoded, $allowedTags);
+
+        // Remove event handler attributes like onclick, onmouseover, etc.
+        $sanitized = preg_replace('/\s+on[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $sanitized);
+
+        // Bloqueia URLs com javascript: em links
+        $sanitized = preg_replace_callback(
+            '/href\s*=\s*("([^"]*)"|\'([^\']*)\')/i',
+            static function (array $matches): string {
+                $quote = $matches[1][0];
+                $url = trim($matches[2] ?? $matches[3] ?? '');
+
+                if (stripos($url, 'javascript:') === 0) {
+                    return 'href=' . $quote . '#' . $quote;
+                }
+
+                return 'href=' . $quote . htmlspecialchars($url, ENT_QUOTES | ENT_HTML5, 'UTF-8') . $quote;
+            },
+            $sanitized
+        );
+
+        $sanitized = str_replace(["\r\n", "\r"], "\n", $sanitized);
+
+        // Substitui quebras de linha simples por <br> apenas quando não estão delimitando tags HTML
+        $sanitized = preg_replace('/(?<!>)\n(?!<)/', '<br>', $sanitized);
+
+        // Remove qualquer quebra de linha remanescente que não tenha sido convertida
+        $sanitized = str_replace("\n", '', $sanitized);
+
+        return $sanitized;
     }
 
     private static function generateTicketContent(array $dados, array $campanhaInfo): string {
@@ -330,64 +370,39 @@ class PluginIdeasIdeiaCreator {
         ?>
         <h2><?php echo __('Nova Ideia', 'ideas'); ?></h2>
 
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Campanha', 'ideas'); ?></th>
-                <td>#<?php echo (int) ($campanhaInfo['id'] ?? 0); ?> - <?php echo Html::clean($campanhaNome); ?></td>
-            </tr>
-            <tr>
-                <th><?php echo __('Área impactada', 'ideas'); ?></th>
-                <td><?php echo $areaImpactada; ?></td>
-            </tr>
-            <tr>
-                <th><?php echo __('Prazo da campanha', 'ideas'); ?></th>
-                <td><?php echo Html::clean($campanhaPrazo); ?></td>
-            </tr>
-        </table>
+        <div class="idea-summary">
+            <p><strong><?php echo __('Campanha', 'ideas'); ?>:</strong> #<?php echo (int) ($campanhaInfo['id'] ?? 0); ?> - <?php echo Html::clean($campanhaNome); ?></p>
+            <p><strong><?php echo __('Área impactada', 'ideas'); ?>:</strong> <?php echo $areaImpactada; ?></p>
+            <p><strong><?php echo __('Prazo da campanha', 'ideas'); ?>:</strong> <?php echo Html::clean($campanhaPrazo); ?></p>
+        </div>
 
-        <br>
+        <div class="idea-section">
+            <h3><?php echo __('Problema identificado', 'ideas'); ?></h3>
+            <div class="idea-section__content">
+                <?php echo $problema !== '' ? $problema : '<em>' . __('Não informado', 'ideas') . '</em>'; ?>
+            </div>
+        </div>
 
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Problema identificado', 'ideas'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo $problema !== '' ? $problema : __('Não informado', 'ideas'); ?></td>
-            </tr>
-        </table>
+        <div class="idea-section">
+            <h3><?php echo __('Solução proposta', 'ideas'); ?></h3>
+            <div class="idea-section__content">
+                <?php echo $solucao !== '' ? $solucao : '<em>' . __('Não informado', 'ideas') . '</em>'; ?>
+            </div>
+        </div>
 
-        <br>
+        <div class="idea-section">
+            <h3><?php echo __('Benefícios e resultados esperados', 'ideas'); ?></h3>
+            <div class="idea-section__content">
+                <?php echo $beneficios !== '' ? $beneficios : '<em>' . __('Não informado', 'ideas') . '</em>'; ?>
+            </div>
+        </div>
 
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Solução proposta', 'ideas'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo $solucao !== '' ? $solucao : __('Não informado', 'ideas'); ?></td>
-            </tr>
-        </table>
-
-        <br>
-
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Benefícios e resultados esperados', 'ideas'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo $beneficios !== '' ? $beneficios : __('Não informado', 'ideas'); ?></td>
-            </tr>
-        </table>
-
-        <br>
-
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Autores da ideia', 'ideas'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo Html::clean(empty($autores) ? __('Nenhum autor informado.', 'ideas') : implode(', ', $autores)); ?></td>
-            </tr>
-        </table>
+        <div class="idea-section">
+            <h3><?php echo __('Autores da ideia', 'ideas'); ?></h3>
+            <div class="idea-section__content">
+                <?php echo Html::clean(empty($autores) ? __('Nenhum autor informado.', 'ideas') : implode(', ', $autores)); ?>
+            </div>
+        </div>
         <?php
         return ob_get_clean();
     }
