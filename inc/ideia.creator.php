@@ -358,64 +358,39 @@ class PluginIdeasIdeiaCreator {
         ?>
         <h2><?php echo __('Nova Ideia', 'ideas'); ?></h2>
 
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Campanha', 'ideas'); ?></th>
-                <td>#<?php echo (int) ($campanhaInfo['id'] ?? 0); ?> - <?php echo Html::clean($campanhaNome); ?></td>
-            </tr>
-            <tr>
-                <th><?php echo __('Área impactada', 'ideas'); ?></th>
-                <td><?php echo $areaImpactada; ?></td>
-            </tr>
-            <tr>
-                <th><?php echo __('Prazo da campanha', 'ideas'); ?></th>
-                <td><?php echo Html::clean($campanhaPrazo); ?></td>
-            </tr>
-        </table>
+        <div class="idea-summary">
+            <p><strong><?php echo __('Campanha', 'ideas'); ?>:</strong> #<?php echo (int) ($campanhaInfo['id'] ?? 0); ?> - <?php echo Html::clean($campanhaNome); ?></p>
+            <p><strong><?php echo __('Área impactada', 'ideas'); ?>:</strong> <?php echo $areaImpactada; ?></p>
+            <p><strong><?php echo __('Prazo da campanha', 'ideas'); ?>:</strong> <?php echo Html::clean($campanhaPrazo); ?></p>
+        </div>
 
-        <br>
+        <div class="idea-section">
+            <h3><?php echo __('Problema identificado', 'ideas'); ?></h3>
+            <div class="idea-section__content">
+                <?php echo $problema !== '' ? $problema : '<em>' . __('Não informado', 'ideas') . '</em>'; ?>
+            </div>
+        </div>
 
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Problema identificado', 'ideas'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo $problema !== '' ? $problema : __('Não informado', 'ideas'); ?></td>
-            </tr>
-        </table>
+        <div class="idea-section">
+            <h3><?php echo __('Solução proposta', 'ideas'); ?></h3>
+            <div class="idea-section__content">
+                <?php echo $solucao !== '' ? $solucao : '<em>' . __('Não informado', 'ideas') . '</em>'; ?>
+            </div>
+        </div>
 
-        <br>
+        <div class="idea-section">
+            <h3><?php echo __('Benefícios e resultados esperados', 'ideas'); ?></h3>
+            <div class="idea-section__content">
+                <?php echo $beneficios !== '' ? $beneficios : '<em>' . __('Não informado', 'ideas') . '</em>'; ?>
+            </div>
+        </div>
 
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Solução proposta', 'ideas'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo $solucao !== '' ? $solucao : __('Não informado', 'ideas'); ?></td>
-            </tr>
-        </table>
-
-        <br>
-
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Benefícios e resultados esperados', 'ideas'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo $beneficios !== '' ? $beneficios : __('Não informado', 'ideas'); ?></td>
-            </tr>
-        </table>
-
-        <br>
-
-        <table class="tab_cadre">
-            <tr>
-                <th><?php echo __('Autores da ideia', 'ideas'); ?></th>
-            </tr>
-            <tr>
-                <td><?php echo Html::clean(empty($autores) ? __('Nenhum autor informado.', 'ideas') : implode(', ', $autores)); ?></td>
-            </tr>
-        </table>
+        <div class="idea-section">
+            <h3><?php echo __('Autores da ideia', 'ideas'); ?></h3>
+            <div class="idea-section__content">
+                <?php echo Html::clean(empty($autores) ? __('Nenhum autor informado.', 'ideas') : implode(', ', $autores)); ?>
+            </div>
+        </div>
         <?php
         return ob_get_clean();
     }
