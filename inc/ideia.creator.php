@@ -300,7 +300,11 @@ class PluginIdeasIdeiaCreator {
 
         $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-        $allowedTags = '<p><br><strong><em><u><ol><ul><li><a><h1><h2><h3><h4><h5><h6><table><thead><tbody><tfoot><tr><th><td><div><span>'; 
+        // Normaliza sequências de quebras de linha vindas como texto literal ("\n")
+        $decoded = str_replace(['\r\n', '\r', '\n'], "\n", $decoded);
+        $decoded = str_replace(["\r\n", "\r"], "\n", $decoded);
+
+        $allowedTags = '<p><br><strong><em><u><ol><ul><li><a><h1><h2><h3><h4><h5><h6><table><thead><tbody><tfoot><tr><th><td><div><span>';
 
         $sanitized = strip_tags($decoded, $allowedTags);
 
@@ -322,6 +326,11 @@ class PluginIdeasIdeiaCreator {
             },
             $sanitized
         );
+
+        $sanitized = str_replace(["\r\n", "\r"], "\n", $sanitized);
+
+        // Substitui quebras de linha simples por <br> apenas quando não estão delimitando tags HTML
+        $sanitized = preg_replace('/(?<!>)\n(?!<)/', "<br>\n", $sanitized);
 
         return $sanitized;
     }
