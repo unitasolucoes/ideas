@@ -293,9 +293,37 @@ class PluginIdeasIdeiaCreator {
 
     private static function sanitizeRichText(?string $value): string {
         $value = $value ?? '';
-        // Retorna o conteúdo HTML do TinyMCE sem processar
-        // O GLPI já faz a sanitização internamente ao salvar
-        return $value;
+
+        if ($value === '') {
+            return '';
+        }
+
+        $decoded = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        $allowedTags = '<p><br><strong><em><u><ol><ul><li><a><h1><h2><h3><h4><h5><h6><table><thead><tbody><tfoot><tr><th><td><div><span>'; 
+
+        $sanitized = strip_tags($decoded, $allowedTags);
+
+        // Remove event handler attributes like onclick, onmouseover, etc.
+        $sanitized = preg_replace('/\s+on[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $sanitized);
+
+        // Bloqueia URLs com javascript: em links
+        $sanitized = preg_replace_callback(
+            '/href\s*=\s*("([^"]*)"|\'([^\']*)\')/i',
+            static function (array $matches): string {
+                $quote = $matches[1][0];
+                $url = trim($matches[2] ?? $matches[3] ?? '');
+
+                if (stripos($url, 'javascript:') === 0) {
+                    return 'href=' . $quote . '#' . $quote;
+                }
+
+                return 'href=' . $quote . htmlspecialchars($url, ENT_QUOTES | ENT_HTML5, 'UTF-8') . $quote;
+            },
+            $sanitized
+        );
+
+        return $sanitized;
     }
 
     private static function generateTicketContent(array $dados, array $campanhaInfo): string {
