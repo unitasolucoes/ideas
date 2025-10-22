@@ -1,0 +1,33 @@
+--------------------------------------------------------------------------
+Customizações Unitá para GLPI
+--------------------------------------------------------------------------
+Licença Comercial de Uso – Unitá Soluções Digitais Ltda.
+
+Estas customizações são licenciadas exclusivamente para uso interno dos
+clientes Unitá, conforme os Termos e Condições disponíveis em:
+
+https://unitasolucoes.com.br/licenca
+
+É proibido copiar, distribuir, sublicenciar, vender, alugar, modificar,
+realizar engenharia reversa ou criar obras derivadas destas customizações
+sem autorização expressa da Unitá.
+
+As customizações são fornecidas "no estado em que se encontram", sem
+garantias de qualquer tipo, e seu uso implica aceite integral das
+condições publicadas.
+
+O uso e o suporte às customizações são vinculados à vigência do contrato
+de prestação de serviços firmado entre a Unitá e o cliente. Com o término,
+rescisão ou não renovação do contrato, o direito de uso e o suporte serão
+imediatamente encerrados, e o cliente se compromete a desinstalar, remover
+e destruir todas as cópias das customizações, sob pena de violação de
+direitos autorais.
+
+--------------------------------------------------------------------------
+@package   UniPlugin - Power Tuning
+@developer Unitá Soluções Digitais Ltda.
+@copyright Copyright (c) 2025 Unitá Soluções Digitais Ltda.
+@license   Licença Comercial - Todos os direitos reservados
+@link      https://unitasolucoes.com.br
+@since     2025
+--------------------------------------------------------------------------
