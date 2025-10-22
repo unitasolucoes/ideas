@@ -319,7 +319,8 @@ class PluginIdeasIdeiaCreator {
                 }
 
                 return 'href=' . $quote . htmlspecialchars($url, ENT_QUOTES | ENT_HTML5, 'UTF-8') . $quote;
-            }
+            },
+            $sanitized
         );
 
         return $sanitized;
